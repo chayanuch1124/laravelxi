@@ -6,6 +6,9 @@ use App\Models\Product;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -168,3 +171,50 @@ Route::get('barchart', function () {
 Route::resource('movie', MovieController::class);
 /* ค้นหา */
 Route::get('movie-filter', [MovieController::class,'indexFilter']); 
+
+/*week 6*/
+
+Route::get('product-index', function () {
+    $products = Product::get();
+    return view('query-test', compact('products'));
+})->name("product.index");
+
+
+Route::get('product-form', function () {    
+    return view('product-form');
+})->name("product.form");
+
+Route::post('/product-submit', function (Request $request) {    
+    $data = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'required|string',
+        'price' => 'required|numeric|min:0',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+    ]);    
+
+    // ตรวจสอบว่ามีการอัปโหลดรูปภาพ
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('uploads', 'public');
+        $url = Storage::url($imagePath);
+        $data["image"] =$url;
+    }
+
+    // บันทึกข้อมูลในฐานข้อมูล
+    Product::create($data);
+
+    return redirect()->route('product.index')->with('success', 'เพิ่มสินค้าแล้ว!');
+})->name('product.submit');
+
+
+
+
+Route::get('form', function () {    
+    return view('form');
+})->name("form");
+
+use App\Http\Controllers\AdmissionController;
+
+Route::get('/admission', [AdmissionController::class, 'showForm'])->name('admission.form');
+Route::post('/admission', [AdmissionController::class, 'submitForm'])->name('admission.submit');
+
+

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Route;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\ProfileController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -67,7 +66,7 @@ Route::get("/gallery/cat", function () {
 
 Route::get("/teacher", function () {
     return view("teacher");
-})->middleware('auth', 'role:admin,teacher,guest') ;
+});
 
 Route::get("/student", function () {
     return view("student");
@@ -219,14 +218,3 @@ Route::get('/admission', [AdmissionController::class, 'showForm'])->name('admiss
 Route::post('/admission', [AdmissionController::class, 'submitForm'])->name('admission.submit');
 
 
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-require __DIR__.'/auth.php';
